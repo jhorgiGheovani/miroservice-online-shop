@@ -55,6 +55,36 @@ cd payment_service && mvn spring-boot:run
 
 > Note: Local development requires Java 17+ and Maven installed.
 
+## API Endpoints
+
+### Auth Service — `localhost:8080`
+
+| Method | Endpoint | Description | Auth Required |
+| ------ | -------- | ----------- | ------------- |
+| POST | `/auth/token` | Login & get JWT token | No |
+
+### User Service — `localhost:8081`
+
+| Method | Endpoint | Description | Auth Required |
+| ------ | -------- | ----------- | ------------- |
+| POST | `/api/users/register` | Register a new user | No |
+
+### Order Service — `localhost:8085`
+
+| Method | Endpoint | Description | Auth Required |
+| ------ | -------- | ----------- | ------------- |
+| POST | `/orders` | Create a new order | Yes (JWT) |
+
+### Payment Service — `localhost:8086`
+
+| Method | Endpoint | Description | Auth Required |
+| ------ | -------- | ----------- | ------------- |
+| GET | `/payments/{paymentId}` | Get payment by ID | Yes (JWT) |
+| POST | `/payments/{paymentId}/pay` | Process payment | Yes (JWT) |
+| POST | `/payments/{paymentId}/fail` | Mark payment as failed | Yes (JWT) |
+
+> Endpoints marked **Yes (JWT)** require `Authorization: Bearer <token>` header.
+
 ## Project Structure
 
 ```
