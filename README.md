@@ -4,12 +4,12 @@ A microservices-based application built with Spring Boot, using Kafka for event-
 
 ## Services
 
-| Service | Port | Database Port |
-|---|---|---|
-| Auth Service | - | 5434 |
-| User Service | - | 5433 |
-| Order Service | - | 5435 |
-| Payment Service | - | 5436 |
+| Service         | Port | Database Port |
+| --------------- | ---- | ------------- |
+| Auth Service    | -    | 5434          |
+| User Service    | -    | 5433          |
+| Order Service   | -    | 5435          |
+| Payment Service | -    | 5436          |
 
 ## Tech Stack
 
@@ -23,20 +23,28 @@ A microservices-based application built with Spring Boot, using Kafka for event-
 ### Prerequisites
 
 - Docker & Docker Compose
-- Java 17+
-- Maven
 
-### Run Infrastructure
+### Run (Production Ready)
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+This single command will automatically:
+
+1. Generate RSA key pair for JWT signing
+2. Start Kafka and all PostgreSQL databases
+3. Build and run all 4 services
+
+### Run (Local Development)
+
+Start infrastructure first:
 
 ```bash
 docker compose up -d
 ```
 
-This starts Kafka and all PostgreSQL databases.
-
-### Run Services
-
-Start each service individually from its directory:
+Then run each service individually:
 
 ```bash
 cd auth_service && mvn spring-boot:run
@@ -44,6 +52,8 @@ cd user_service && mvn spring-boot:run
 cd order_service && mvn spring-boot:run
 cd payment_service && mvn spring-boot:run
 ```
+
+> Note: Local development requires Java 17+ and Maven installed.
 
 ## Project Structure
 
