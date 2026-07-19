@@ -1,4 +1,20 @@
 services:
+  key-generator:
+    image: alpine/openssl
+    container_name: key-generator
+    volumes:
+      - keys_data:/keys
+    command: >
+      sh -c "
+        if [ ! -f /keys/private_key.pem ]; then
+          openssl genrsa -out /keys/private_key.pem 2048 &&
+          openssl rsa -in /keys/private_key.pem -pubout -out /keys/public_key.pem &&
+          echo 'Keys generated successfully.'
+        else
+          echo 'Keys already exist, skipping generation.'
+        fi
+      "
+
   kafka:
     image: apache/kafka:latest
     container_name: kafka
@@ -75,7 +91,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       APP_KEYS_PUBLIC_KEY_PATH: /app/keys/public_key.pem
+    volumes:
+      - keys_data:/app/keys:ro
     depends_on:
+      key-generator:
+        condition: service_completed_successfully
       user-db:
         condition: service_healthy
       kafka:
@@ -94,7 +114,11 @@ services:
       APP_KEYS_PRIVATE_KEY_PATH: /app/keys/private_key.pem
       APP_KEYS_PUBLIC_KEY_PATH: /app/keys/public_key.pem
       APP_USER_SERVICE_BASE_URL: http://user-service:8081
+    volumes:
+      - keys_data:/app/keys:ro
     depends_on:
+      key-generator:
+        condition: service_completed_successfully
       kafka:
         condition: service_healthy
       user-service:
@@ -114,7 +138,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       APP_KEYS_PUBLIC_KEY_PATH: /app/keys/public_key.pem
+    volumes:
+      - keys_data:/app/keys:ro
     depends_on:
+      key-generator:
+        condition: service_completed_successfully
       order-db:
         condition: service_healthy
       kafka:
@@ -151,7 +179,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       APP_KEYS_PUBLIC_KEY_PATH: /app/keys/public_key.pem
+    volumes:
+      - keys_data:/app/keys:ro
     depends_on:
+      key-generator:
+        condition: service_completed_successfully
       payment-db:
         condition: service_healthy
       kafka:
@@ -160,6 +192,7 @@ services:
       - app-network
 
 volumes:
+  keys_data:
   kafka_data:
   user_db_data:
   order_db_data:
