@@ -74,6 +74,7 @@ cd payment_service && mvn spring-boot:run
 | Method | Endpoint | Description | Auth Required |
 | ------ | -------- | ----------- | ------------- |
 | POST | `/orders` | Create a new order | Yes (JWT) |
+| GET | `/orders/my-orders` | Get current user's order history with item count | Yes (JWT) |
 
 ### Payment Service — `localhost:8086`
 
