@@ -20,7 +20,7 @@ public class Payment {
     @Column(name = "customer_id", nullable = false)
     private String customerId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String email;
 
     @Column(nullable = false)
