@@ -35,8 +35,9 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public Payment getById(UUID paymentId, String requestingCustomerId) {
-        Payment payment = findOrThrow(paymentId);
+    public Payment getByOrderId(UUID orderId, String requestingCustomerId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found"));
         checkOwnership(payment, requestingCustomerId);
         return payment;
     }

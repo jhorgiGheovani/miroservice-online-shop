@@ -28,11 +28,11 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(PaymentResponse.from(payment));
     }
 
-    @GetMapping("/{paymentId}")
-    public ResponseEntity<PaymentResponse> get(@PathVariable UUID paymentId,
-                                               HttpServletRequest httpRequest) {
+    @GetMapping("/{orderId}")
+    public ResponseEntity<PaymentResponse> getByOrderId(@PathVariable UUID orderId,
+                                                        HttpServletRequest httpRequest) {
         String customerId = extractCustomerId(httpRequest);
-        Payment payment = paymentService.getById(paymentId, customerId);
+        Payment payment = paymentService.getByOrderId(orderId, customerId);
         return ResponseEntity.ok(PaymentResponse.from(payment));
     }
 

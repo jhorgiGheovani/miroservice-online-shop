@@ -59,9 +59,9 @@ cd payment_service && mvn spring-boot:run
 
 ### Auth Service — `localhost:8080`
 
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| POST | `/auth/token` | Login & get JWT token | No |
+| Method | Endpoint      | Description           | Auth Required |
+| ------ | ------------- | --------------------- | ------------- |
+| POST   | `/auth/token` | Login & get JWT token | No            |
 
 ```bash
 curl -X POST http://localhost:8080/auth/token \
@@ -71,9 +71,9 @@ curl -X POST http://localhost:8080/auth/token \
 
 ### User Service — `localhost:8081`
 
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| POST | `/api/users/register` | Register a new user | No |
+| Method | Endpoint              | Description         | Auth Required |
+| ------ | --------------------- | ------------------- | ------------- |
+| POST   | `/api/users/register` | Register a new user | No            |
 
 ```bash
 curl -X POST http://localhost:8081/api/users/register \
@@ -83,10 +83,10 @@ curl -X POST http://localhost:8081/api/users/register \
 
 ### Order Service — `localhost:8085`
 
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| POST | `/orders` | Create a new order | Yes (JWT) |
-| GET | `/orders/my-orders` | Get current user's order history with item count | Yes (JWT) |
+| Method | Endpoint            | Description                                      | Auth Required |
+| ------ | ------------------- | ------------------------------------------------ | ------------- |
+| POST   | `/orders`           | Create a new order                               | Yes (JWT)     |
+| GET    | `/orders/my-orders` | Get current user's order history with item count | Yes (JWT)     |
 
 ```bash
 # Create a new order
@@ -107,15 +107,15 @@ curl -X GET http://localhost:8085/orders/my-orders \
 
 ### Payment Service — `localhost:8086`
 
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| GET | `/payments/{paymentId}` | Get payment by ID | Yes (JWT) |
-| POST | `/payments/{paymentId}/pay` | Process payment | Yes (JWT) |
-| POST | `/payments/{paymentId}/fail` | Mark payment as failed | Yes (JWT) |
+| Method | Endpoint                     | Description             | Auth Required |
+| ------ | ---------------------------- | ----------------------- | ------------- |
+| GET    | `/payments/{orderId}`        | Get payment by order ID | Yes (JWT)     |
+| POST   | `/payments/{paymentId}/pay`  | Process payment         | Yes (JWT)     |
+| POST   | `/payments/{paymentId}/fail` | Mark payment as failed  | Yes (JWT)     |
 
 ```bash
-# Get payment by ID
-curl -X GET http://localhost:8086/payments/<paymentId> \
+# Get payment by order ID
+curl -X GET http://localhost:8086/payments/<orderId> \
   -H "Authorization: Bearer <token>"
 
 # Process payment
