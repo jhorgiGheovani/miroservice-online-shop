@@ -1,6 +1,7 @@
 package com.jhorgi.order_service.order.service;
 
 import com.jhorgi.order_service.order.dto.CreateOrderRequest;
+import com.jhorgi.order_service.order.dto.OrderSummaryResponse;
 import com.jhorgi.order_service.order.entity.Order;
 import com.jhorgi.order_service.order.entity.OrderItem;
 import com.jhorgi.order_service.order.repository.OrderRepository;
@@ -37,5 +38,14 @@ public class OrderService {
         paymentClient.createPayment(saved.getId(), saved.getGrandTotal(), customerId);
 
         return saved;
+    }
+
+    public List<OrderSummaryResponse> getMyOrders(String customerId) {
+        return orderRepository.findOrderSummariesByCustomerId(customerId)
+                .stream()
+                .map(p -> new OrderSummaryResponse(
+                        p.getId(), p.getStatus(), p.getGrandTotal(),
+                        p.getCreatedAt(), p.getItemCount(), p.getTotalQuantity()))
+                .toList();
     }
 }

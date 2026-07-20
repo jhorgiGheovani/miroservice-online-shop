@@ -1,16 +1,20 @@
 package com.jhorgi.order_service.order.controller;
 
 import com.jhorgi.order_service.order.dto.CreateOrderRequest;
+import com.jhorgi.order_service.order.dto.OrderSummaryResponse;
 import com.jhorgi.order_service.order.entity.Order;
 import com.jhorgi.order_service.order.service.OrderService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -29,5 +33,12 @@ public class OrderController {
         String customerId = claims.getSubject();
         Order order = orderService.createOrder(request, customerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    }
+
+    @GetMapping("/my-orders")
+    public ResponseEntity<List<OrderSummaryResponse>> getMyOrders(HttpServletRequest httpRequest) {
+        Claims claims = (Claims) httpRequest.getAttribute("jwtClaims");
+        String customerId = claims.getSubject();
+        return ResponseEntity.ok(orderService.getMyOrders(customerId));
     }
 }
