@@ -59,15 +59,33 @@ cd payment_service && mvn spring-boot:run
 
 ### Auth Service — `localhost:8080`
 
-| Method | Endpoint      | Description           | Auth Required |
-| ------ | ------------- | --------------------- | ------------- |
-| POST   | `/auth/token` | Login & get JWT token | No            |
+| Method | Endpoint            | Description                        | Auth Required |
+| ------ | ------------------- | ---------------------------------- | ------------- |
+| POST   | `/auth/token`       | Login & get JWT token              | No            |
+| POST   | `/auth/rotate-keys` | Rotate RSA key pair for JWT signing | No            |
 
 ```bash
 curl -X POST http://localhost:8080/auth/token \
   -H "Content-Type: application/json" \
   -d '{"username": "john", "password": "secret"}'
+
+# Rotate RSA keys
+curl -X POST http://localhost:8080/auth/rotate-keys
 ```
+
+#### About `/auth/rotate-keys`
+
+This service uses RSA asymmetric keys to sign and verify JWT tokens:
+- The **auth service** holds the **private key** (used to sign tokens)
+- All other services (user, order, payment) hold the **public key** (used to verify tokens)
+
+When `/auth/rotate-keys` is called:
+1. A new RSA 2048-bit key pair is generated
+2. The new key pair replaces the old one in memory and is persisted to the `.pem` file
+3. The new **public key is published to Kafka** (`key-rotation` topic)
+4. All other services consume the Kafka event and **hot-reload their public key** without restarting
+
+This ensures that after rotation, tokens signed with the old key are immediately invalidated and all services transparently switch to verifying against the new public key.
 
 ### User Service — `localhost:8081`
 
