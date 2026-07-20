@@ -63,11 +63,23 @@ cd payment_service && mvn spring-boot:run
 | ------ | -------- | ----------- | ------------- |
 | POST | `/auth/token` | Login & get JWT token | No |
 
+```bash
+curl -X POST http://localhost:8080/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{"username": "john", "password": "secret"}'
+```
+
 ### User Service — `localhost:8081`
 
 | Method | Endpoint | Description | Auth Required |
 | ------ | -------- | ----------- | ------------- |
 | POST | `/api/users/register` | Register a new user | No |
+
+```bash
+curl -X POST http://localhost:8081/api/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "username": "john", "password": "secret", "email": "john@example.com"}'
+```
 
 ### Order Service — `localhost:8085`
 
@@ -76,6 +88,23 @@ cd payment_service && mvn spring-boot:run
 | POST | `/orders` | Create a new order | Yes (JWT) |
 | GET | `/orders/my-orders` | Get current user's order history with item count | Yes (JWT) |
 
+```bash
+# Create a new order
+curl -X POST http://localhost:8085/orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "items": [
+      {"productId": "prod-001", "quantity": 2, "unitPrice": 50000},
+      {"productId": "prod-002", "quantity": 1, "unitPrice": 120000}
+    ]
+  }'
+
+# Get current user's order history
+curl -X GET http://localhost:8085/orders/my-orders \
+  -H "Authorization: Bearer <token>"
+```
+
 ### Payment Service — `localhost:8086`
 
 | Method | Endpoint | Description | Auth Required |
@@ -83,6 +112,20 @@ cd payment_service && mvn spring-boot:run
 | GET | `/payments/{paymentId}` | Get payment by ID | Yes (JWT) |
 | POST | `/payments/{paymentId}/pay` | Process payment | Yes (JWT) |
 | POST | `/payments/{paymentId}/fail` | Mark payment as failed | Yes (JWT) |
+
+```bash
+# Get payment by ID
+curl -X GET http://localhost:8086/payments/<paymentId> \
+  -H "Authorization: Bearer <token>"
+
+# Process payment
+curl -X POST http://localhost:8086/payments/<paymentId>/pay \
+  -H "Authorization: Bearer <token>"
+
+# Mark payment as failed
+curl -X POST http://localhost:8086/payments/<paymentId>/fail \
+  -H "Authorization: Bearer <token>"
+```
 
 > Endpoints marked **Yes (JWT)** require `Authorization: Bearer <token>` header.
 
