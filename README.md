@@ -55,13 +55,143 @@ cd payment_service && mvn spring-boot:run
 
 > Note: Local development requires Java 17+ and Maven installed.
 
+## Application Flow
+
+### 1. Register & Login
+
+```
+Client
+  │
+  ├─► POST /api/users/register  ──►  User Service  ──►  user_db (save user)
+  │
+  └─► POST /auth/token
+            │
+            ├─► Auth Service  ──► (REST) ──►  User Service /api/users/validate
+            │                                     └─► verify username & password
+            │
+            └─► sign JWT with RSA private key  ──►  return token to client
+```
+
+The auth service **never stores users** — it delegates credential validation to the user service via REST, then signs the JWT itself using its RSA private key.
+
+---
+
+### 2. Create an Order
+
+```
+Client
+  │
+  └─► POST /orders  (JWT in header)
+            │
+            Order Service
+              ├─► verify JWT using RSA public key (in-memory, no auth service call)
+              ├─► calculate grand total using Java Stream (map + reduce)
+              ├─► save Order + OrderItems  ──►  order_db
+              │
+              └─► (REST + API Key) ──►  Payment Service POST /payments
+                                            └─► create Payment record (PENDING)  ──►  payment_db
+```
+
+Order service calls payment service synchronously via REST using an internal API key (`X-Internal-Api-Key`) — this call is service-to-service only, not exposed to the client.
+
+---
+
+### 3. Pay or Fail a Payment
+
+```
+Client
+  │
+  └─► POST /payments/{paymentId}/pay  (JWT in header)
+            │
+            Payment Service
+              ├─► verify JWT
+              ├─► verify ownership (customerId in JWT must match payment's customerId)
+              ├─► update Payment status  ──►  PENDING → SUCCESS (or FAILED)
+              │
+              └─► publish event to Kafka (payment-events topic)
+                      └─► {orderId, paymentStatus, email, amount}
+```
+
+After payment, a Kafka event is published with the result. Any downstream service (e.g. notification service) can consume this event to send confirmation emails or update order status.
+
+---
+
+### 4. View Order History
+
+```
+Client
+  │
+  └─► GET /orders/my-orders  (JWT in header)
+            │
+            Order Service
+              ├─► extract customerId from JWT claims
+              ├─► run native SQL query (JOIN orders + order_items, GROUP BY, COUNT, SUM)
+              └─► map results to response using Java Stream  ──►  return to client
+```
+
+---
+
+### 5. Key Rotation (Admin)
+
+```
+Admin
+  │
+  └─► POST /auth/rotate-keys
+            │
+            Auth Service
+              ├─► generate new RSA 2048-bit key pair
+              ├─► replace in-memory key pair
+              ├─► persist new keys to .pem files
+              │
+              └─► publish new public key to Kafka (key-rotation topic)
+                      │
+                      ├─► User Service consumer  ──►  hot-reload public key in memory
+                      ├─► Order Service consumer  ──►  hot-reload public key in memory
+                      └─► Payment Service consumer  ──►  hot-reload public key in memory
+```
+
+All services update their public key **without restarting**. Tokens signed with the old private key are immediately invalidated after rotation.
+
+---
+
+### Flow Summary Diagram
+
+```
+                              ┌─────────────┐
+                              │   Client    │
+                              └──┬──┬──┬──┬─┘
+             ┌────────────────── ┘  │  │  └──────────────────┐
+             │              ┌───────┘  └───────┐              │
+       ┌─────▼──────┐ ┌─────▼──────┐ ┌─────────▼──┐ ┌────────▼───────┐
+       │    Auth    │ │    User    │ │    Order   │ │    Payment    │
+       │  Service   │ │  Service   │ │  Service   │ │    Service    │
+       │   :8080    │ │   :8081    │ │   :8085    │ │     :8086     │
+       └─────┬──────┘ └─────┬──────┘ └──┬──────┬──┘ └───────┬───────┘
+             │              │            │      │             │
+             └────REST──────►            │      └────REST─────►
+                            │            │                    │
+                       ┌────▼────┐  ┌────▼────┐         ┌────▼──────┐
+                       │ user_db │  │order_db │         │payment_db │
+                       │  :5433  │  │  :5435  │         │  :5436    │
+                       └─────────┘  └─────────┘         └─────┬─────┘
+                                                               │
+                                                    Kafka: payment-events
+                                                               ▼
+                                                    (downstream consumers)
+
+  Kafka: key-rotation
+  Auth Service ──► User Service, Order Service, Payment Service
+```
+
+---
+
 ## API Endpoints
 
 ### Auth Service — `localhost:8080`
 
-| Method | Endpoint            | Description                        | Auth Required |
-| ------ | ------------------- | ---------------------------------- | ------------- |
-| POST   | `/auth/token`       | Login & get JWT token              | No            |
+| Method | Endpoint            | Description                         | Auth Required |
+| ------ | ------------------- | ----------------------------------- | ------------- |
+| POST   | `/auth/token`       | Login & get JWT token               | No            |
 | POST   | `/auth/rotate-keys` | Rotate RSA key pair for JWT signing | No            |
 
 ```bash
@@ -76,10 +206,12 @@ curl -X POST http://localhost:8080/auth/rotate-keys
 #### About `/auth/rotate-keys`
 
 This service uses RSA asymmetric keys to sign and verify JWT tokens:
+
 - The **auth service** holds the **private key** (used to sign tokens)
 - All other services (user, order, payment) hold the **public key** (used to verify tokens)
 
 When `/auth/rotate-keys` is called:
+
 1. A new RSA 2048-bit key pair is generated
 2. The new key pair replaces the old one in memory and is persisted to the `.pem` file
 3. The new **public key is published to Kafka** (`key-rotation` topic)
