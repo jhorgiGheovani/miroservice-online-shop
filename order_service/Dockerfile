@@ -11,4 +11,4 @@ COPY --from=build /app/target/*.jar app.jar
 COPY src/main/resources/public_key.pem /app/keys/public_key.pem
 ENV APP_KEYS_PUBLIC_KEY_PATH=/app/keys/public_key.pem
 EXPOSE 8085
-ENTRYPOINT ["ava", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
