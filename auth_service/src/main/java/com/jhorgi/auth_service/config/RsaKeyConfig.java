@@ -25,6 +25,9 @@ public class RsaKeyConfig {
     @Value("${app.keys.public-key-path}")
     private String publicKeyPath;
 
+    @Value("${app.keys.shared-public-key-path:}")
+    private String sharedPublicKeyPath;
+
     private final AtomicReference<KeyPair> currentKeyPair = new AtomicReference<>();
 
     @PostConstruct
@@ -49,6 +52,7 @@ public class RsaKeyConfig {
     public void persistKeyPair(KeyPair keyPair) throws IOException {
         writePemFile(privateKeyPath, "PRIVATE KEY", keyPair.getPrivate().getEncoded());
         writePemFile(publicKeyPath, "PUBLIC KEY", keyPair.getPublic().getEncoded());
+        writePemFile(sharedPublicKeyPath, "PUBLIC KEY", keyPair.getPublic().getEncoded());
     }
 
     private PrivateKey loadPrivateKey() throws Exception {

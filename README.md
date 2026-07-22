@@ -15,8 +15,21 @@ A microservices-based application built with Spring Boot, using Kafka for event-
 
 - **Java / Spring Boot** — each service
 - **PostgreSQL** — per-service database (DB per service pattern)
-- **Apache Kafka** — async inter-service messaging
+- **Apache Kafka (KRaft mode)** — async inter-service messaging, no Zookeeper required
 - **Docker / Docker Compose** — containerized infrastructure
+
+### Why KRaft over Zookeeper
+
+This project uses Kafka in **KRaft mode** (Kafka's built-in consensus protocol) instead of the older Zookeeper-based setup.
+
+| | KRaft (used here) | Zookeeper |
+|---|---|---|
+| **Ops complexity** | Single process | Two separate processes (Kafka + ZK) |
+| **Extra containers** | None | Requires a Zookeeper container + port 2181 |
+| **Scalability** | Supports millions of partitions | Bottlenecks around 200k partitions |
+| **Status** | Kafka's present and future | Deprecated since Kafka 3.x, removed in Kafka 4.0 |
+
+Zookeeper would only be needed for very old Kafka tooling (pre-3.x). For any new project, KRaft is the correct choice.
 
 ## Getting Started
 
