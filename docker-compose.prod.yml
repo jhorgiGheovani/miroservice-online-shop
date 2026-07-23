@@ -90,8 +90,6 @@ services:
     build:
       context: ./user_service
     container_name: user-service
-    ports:
-      - "8081:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/user_service
       SPRING_DATASOURCE_USERNAME: postgres
@@ -114,8 +112,6 @@ services:
     build:
       context: ./auth_service
     container_name: auth-service
-    ports:
-      - "8080:8080"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       APP_KEYS_PRIVATE_KEY_PATH: /app/keys/private_key.pem
@@ -138,9 +134,8 @@ services:
   order-service:
     build:
       context: ./order_service
-    container_name: order-service
-    ports:
-      - "8085:8085"
+    deploy:
+      replicas: 3
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_service
       SPRING_DATASOURCE_USERNAME: postgres
@@ -180,8 +175,6 @@ services:
     build:
       context: ./payment_service
     container_name: payment-service
-    ports:
-      - "8086:8086"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://payment-db:5432/payment_service
       SPRING_DATASOURCE_USERNAME: postgres
@@ -204,7 +197,7 @@ services:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "80:80"
+      - "7576:7576"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
