@@ -87,8 +87,9 @@ services:
       - app-network
 
   user-service:
-    build:
-      context: ./user_service
+    # build:
+    #   context: ./user_service
+    image: jhorgigheovani/user-service-microservices:v1.0.0
     container_name: user-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/user_service
@@ -109,8 +110,9 @@ services:
       - app-network
 
   auth-service:
-    build:
-      context: ./auth_service
+    # build:
+    #   context: ./auth_service
+    image: jhorgigheovani/auth-service-microservice:v1.0.0
     container_name: auth-service
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
@@ -132,10 +134,12 @@ services:
       - app-network
 
   order-service:
-    build:
-      context: ./order_service
-    deploy:
-      replicas: 3
+    # build:
+    #   context: ./order_service
+    # deploy:
+    #   replicas: 3
+    image: jhorgigheovani/order-service-microservices:v1.0.0
+    container_name: order-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_service
       SPRING_DATASOURCE_USERNAME: postgres
@@ -172,8 +176,9 @@ services:
       - app-network
 
   payment-service:
-    build:
-      context: ./payment_service
+    # build:
+    #   context: ./payment_service
+    image: jhorgigheovani/payment-service-microservice:v1.0.0
     container_name: payment-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://payment-db:5432/payment_service
