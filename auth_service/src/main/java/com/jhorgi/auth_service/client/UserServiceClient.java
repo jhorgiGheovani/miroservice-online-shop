@@ -19,7 +19,7 @@ public class UserServiceClient {
                 .build();
     }
 
-    public void validateCredentials(TokenRequest request) {
+    public ValidateUserResponse validateCredentials(TokenRequest request) {
         ValidateUserResponse response = restClient.post()
                 .uri("/api/users/validate")
                 .body(request)
@@ -29,5 +29,7 @@ public class UserServiceClient {
         if (response == null || !response.isValid()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
+
+        return response;
     }
 }

@@ -4,6 +4,7 @@ import com.jhorgi.auth_service.client.UserServiceClient;
 import com.jhorgi.auth_service.config.RsaKeyConfig;
 import com.jhorgi.auth_service.dto.TokenRequest;
 import com.jhorgi.auth_service.dto.TokenResponse;
+import com.jhorgi.auth_service.dto.ValidateUserResponse;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,14 @@ public class TokenService {
     }
 
     public TokenResponse generateToken(TokenRequest request) {
-        userServiceClient.validateCredentials(request);
+        ValidateUserResponse data = userServiceClient.validateCredentials(request);
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
         String token = Jwts.builder()
                 .subject(request.getUsername())
+                .claim("email",data.getEmail())
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(rsaKeyConfig.getPrivateKey())

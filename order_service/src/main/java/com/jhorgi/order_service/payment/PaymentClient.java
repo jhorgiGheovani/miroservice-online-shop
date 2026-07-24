@@ -28,7 +28,7 @@ public class PaymentClient {
         this.restTemplate = restTemplate;
     }
 
-    public void createPayment(UUID orderId, BigDecimal amount, String customerId) {
+    public void createPayment(UUID orderId, BigDecimal amount, String customerId, String email) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-Internal-Api-Key", apiKey);
@@ -36,7 +36,8 @@ public class PaymentClient {
         Map<String, Object> body = Map.of(
                 "orderId", orderId.toString(),
                 "customerId", customerId,
-                "amount", amount
+                "amount", amount,
+                "email", email
         );
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);

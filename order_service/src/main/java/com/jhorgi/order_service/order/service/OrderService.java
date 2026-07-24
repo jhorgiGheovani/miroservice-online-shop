@@ -23,7 +23,7 @@ public class OrderService {
         this.paymentClient = paymentClient;
     }
 
-    public Order createOrder(CreateOrderRequest request, String customerId) {
+    public Order createOrder(CreateOrderRequest request, String customerId, String email) {
         List<OrderItem> items = request.getItems().stream()
                 .map(i -> new OrderItem(i.getProductId(), i.getQuantity(), i.getUnitPrice()))
                 .toList();
@@ -35,7 +35,7 @@ public class OrderService {
         Order order = new Order(customerId, grandTotal, "PENDING", LocalDateTime.now(), items);
         Order saved = orderRepository.save(order);
 
-        paymentClient.createPayment(saved.getId(), saved.getGrandTotal(), customerId);
+        paymentClient.createPayment(saved.getId(), saved.getGrandTotal(), customerId, email);
 
         return saved;
     }

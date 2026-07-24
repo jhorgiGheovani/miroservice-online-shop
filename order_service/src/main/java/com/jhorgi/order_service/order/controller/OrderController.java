@@ -31,7 +31,8 @@ public class OrderController {
                                              HttpServletRequest httpRequest) {
         Claims claims = (Claims) httpRequest.getAttribute("jwtClaims");
         String customerId = claims.getSubject();
-        Order order = orderService.createOrder(request, customerId);
+        String email = claims.get("email", String.class);
+        Order order = orderService.createOrder(request, customerId, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
