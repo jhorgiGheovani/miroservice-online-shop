@@ -198,6 +198,21 @@ services:
     networks:
       - app-network
 
+  notif-service:
+    # build:
+    #   context: ./notif_service
+    image: jhorgigheovani/notif-service-microservice:v1.0.0
+    container_name: notif-service
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - app-network
+
   nginx:
     image: nginx:alpine
     container_name: nginx
