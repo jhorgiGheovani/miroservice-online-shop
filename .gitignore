@@ -1,0 +1,39 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Maven build output
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+
+# Logs
+*.log
+logs/
+
+# IDE - IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Eclipse / STS
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath
+
+# IDE - VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+k6/
+
+nginx-main.conf
+
