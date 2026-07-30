@@ -1,7 +1,6 @@
 package com.jhorgi.user_service.controller;
 
 import com.jhorgi.user_service.dto.RegisterRequest;
-import com.jhorgi.user_service.dto.ValidateRequest;
 import com.jhorgi.user_service.entity.User;
 import com.jhorgi.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,14 +30,5 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
-    }
-
-    @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validate(@RequestBody ValidateRequest request) {
-        Optional<User> user = userService.validate(request.getUsername(), request.getPassword());
-        if (user.isPresent()) {
-            return ResponseEntity.ok(Map.of("valid", true, "email", user.get().getEmail()));
-        }
-        return ResponseEntity.ok(Map.of("valid", false));
     }
 }
