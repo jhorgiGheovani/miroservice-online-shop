@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -26,7 +26,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request,
                                              HttpServletRequest httpRequest) {
         Claims claims = (Claims) httpRequest.getAttribute("jwtClaims");
