@@ -3,6 +3,7 @@ package com.jhorgi.auth_service.config;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,7 +53,9 @@ public class RsaKeyConfig {
     public void persistKeyPair(KeyPair keyPair) throws IOException {
         writePemFile(privateKeyPath, "PRIVATE KEY", keyPair.getPrivate().getEncoded());
         writePemFile(publicKeyPath, "PUBLIC KEY", keyPair.getPublic().getEncoded());
-        writePemFile(sharedPublicKeyPath, "PUBLIC KEY", keyPair.getPublic().getEncoded());
+        if (StringUtils.hasText(sharedPublicKeyPath)) {
+            writePemFile(sharedPublicKeyPath, "PUBLIC KEY", keyPair.getPublic().getEncoded());
+        }
     }
 
     private PrivateKey loadPrivateKey() throws Exception {
