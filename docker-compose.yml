@@ -20,7 +20,9 @@ services:
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
     volumes:
-      - microservices_kafka_data:/bitnami/kafka
+      - microservices_kafka_data:/var/lib/kafka/data
+      - microservices_kafka_secrets:/etc/kafka/secrets
+      - microservices_kafka_config:/mnt/shared/config
     networks:
       - app-network
 
@@ -82,6 +84,8 @@ services:
 
 volumes:
   microservices_kafka_data:
+  microservices_kafka_secrets:
+  microservices_kafka_config:
   user_service_db_data:
   order_service_db_data:
   auth_service_db_data:
