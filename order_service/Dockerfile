@@ -8,7 +8,10 @@ RUN mvn package -DskipTests -q
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-RUN mkdir -p /app/keys via the mounted volume
+# create directory to save .pem key 
+RUN mkdir -p /app/keys 
+
+#replace app.keys.public-key-path from application.properties
 ENV APP_KEYS_PUBLIC_KEY_PATH=/app/keys/public_key.pem
 EXPOSE 8085
 ENTRYPOINT ["java", "-jar", "app.jar"]
