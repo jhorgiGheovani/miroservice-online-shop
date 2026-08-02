@@ -39,7 +39,9 @@ services:
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
     volumes:
-      - kafka_data:/bitnami/kafka
+      - kafka_data:/var/lib/kafka/data
+      - kafka_secrets:/etc/kafka/secrets
+      - kafka_config:/mnt/shared/config
     healthcheck:
       test:
         [
@@ -245,6 +247,8 @@ volumes:
   auth_keys_data:
   public_keys_data:
   kafka_data:
+  kafka_secrets:
+  kafka_config:
   user_db_data:
   order_db_data:
   payment_db_data:
