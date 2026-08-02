@@ -1,0 +1,64 @@
+name: payment_service CI
+
+# Builds the payment_service Docker image and pushes it to GHCR.
+# Structure: one workflow per service, path-filtered so only changes under
+# payment_service/** (or this file) trigger it. Tests are skipped in CI for now — the
+# multi-stage Dockerfile compiles the jar with -DskipTests. See planCICD.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'payment_service/**'
+      - '.github/workflows/payment_service.yml'
+  pull_request:
+    paths:
+      - 'payment_service/**'
+      - '.github/workflows/payment_service.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Only log in when we intend to push (i.e. on pushes to main, not on PRs).
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/payment_service
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./payment_service
+          file: ./payment_service/Dockerfile
+          # Push only on pushes to main; PRs build to validate but don't publish.
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
