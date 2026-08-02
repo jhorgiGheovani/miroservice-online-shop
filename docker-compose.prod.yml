@@ -94,7 +94,8 @@ services:
   user-service:
     # build:
     #   context: ./user_service
-    image: jhorgigheovani/user-service-microservices:v1.0.0
+    # image: jhorgigheovani/user-service-microservices:v1.0.0
+    image: ghcr.io/jhorgigheovani/user_service:latest
     container_name: user-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/user_service
@@ -117,7 +118,8 @@ services:
   auth-service:
     # build:
     #   context: ./auth_service
-    image: jhorgigheovani/auth-service-microservice:v1.0.0
+    # image: jhorgigheovani/auth-service-microservice:v1.0.0
+    image: ghcr.io/jhorgigheovani/auth_service:latest
     container_name: auth-service
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
@@ -143,7 +145,8 @@ services:
     #   context: ./order_service
     # deploy:
     #   replicas: 3
-    image: jhorgigheovani/order-service-microservices:v1.0.0
+    # image: jhorgigheovani/order-service-microservices:v1.0.0
+    image: ghcr.io/jhorgigheovani/order_service:latest
     container_name: order-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_service
@@ -185,7 +188,8 @@ services:
   payment-service:
     # build:
     #   context: ./payment_service
-    image: jhorgigheovani/payment-service-microservice:v1.0.0
+    # image: jhorgigheovani/payment-service-microservice:v1.0.0
+    image: ghcr.io/jhorgigheovani/payment_service:latest
     container_name: payment-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://payment-db:5432/payment_service
@@ -208,7 +212,8 @@ services:
   notif-service:
     # build:
     #   context: ./notif_service
-    image: jhorgigheovani/notif-service-microservice:v1.0.0
+    # image: jhorgigheovani/notif-service-microservice:v1.0.0
+    image: ghcr.io/jhorgigheovani/notif_service:latest
     container_name: notif-service
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092

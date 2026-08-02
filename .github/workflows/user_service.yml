@@ -56,6 +56,7 @@ jobs:
         with:
           context: ./user_service
           file: ./user_service/Dockerfile
+          platforms: linux/amd64,linux/arm64
           # Push only on pushes to main; PRs build to validate but don't publish.
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
