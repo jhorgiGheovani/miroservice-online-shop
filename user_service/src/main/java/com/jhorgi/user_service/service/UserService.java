@@ -30,4 +30,9 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public Optional<User> validate(String username, String password) {
+        return userRepository.findByUsername(username)
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()));
+    }
 }
