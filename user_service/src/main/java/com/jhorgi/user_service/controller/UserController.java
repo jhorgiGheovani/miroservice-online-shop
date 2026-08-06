@@ -34,12 +34,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validate(@RequestBody ValidateRequest request) {
-        Optional<User> user = userService.validate(request.getUsername(), request.getPassword());
-        if (user.isPresent()) {
-            return ResponseEntity.ok(Map.of("valid", true, "email", user.get().getEmail()));
-        }
-        return ResponseEntity.ok(Map.of("valid", false));
-    }
+//    @PostMapping("/validate")
+//    public ResponseEntity<Map<String, Object>> validate(@RequestBody ValidateRequest request) {
+//        Optional<User> user = userService.validate(request.getUsername(), request.getPassword());
+//        if (user.isPresent()) {
+//            return ResponseEntity.ok(Map.of("valid", true, "email", user.get().getEmail()));
+//        }
+//        return ResponseEntity.ok(Map.of("valid", false));
+//    }
 }
